@@ -1,0 +1,140 @@
+#!/bin/bash
+################################################################################
+clear && printf "Welcome to Sf2_Batch_Recording 
+
+this script let you make some nice wave files from sf2 
+it is only a bash script for making some samples for the SamplerBox
+
+"
+
+printf "TODO
+
+	- are the incoming information from user correct?
+	- is the needed software installed?
+"
+
+printf "
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!											!
+! Please think before type. I do not catch up mistakes made by user at the moment.	!
+! In later releases i will do. But not yet.						!	
+!											!
+! Note, this will take a long time. A simple example:					!
+!											!
+! This script needs about 1 second to run. Because of waiting till fluidsynth is started!
+! and sendmidi is connected. This will happen every note.				!
+! 											!
+! You want have 128 notes in one velocity and every sample will have 14 seconds 	!
+!											!
+! 14 sec sample + 1 sec script x 128 samples / 60 sec = 32 Minutes !			!
+!											!
+! Test it first with one or two notes							!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+"
+#################################################################################
+printf"
+NEEDED:
+
+https://github.com/gbevin/SendMIDI
+https://github.com/FluidSynth/fluidsynth
+https://sox.sourceforge.io/
+
+"
+
+### Set folder for banks, read content and ask user to choose one ##############
+
+BKFOLDER='/Library/Audio/Sounds/Banks/'
+ls $BKFOLDER > /var/tmp/Banks_
+cat -n /var/tmp/Banks_
+echo 'Choose a soundbank in integer:'
+read CHOOSEBANK
+SOUNDBANK=$(tail +$CHOOSEBANK /var/tmp/Banks_ | head -1)
+mkdir $SOUNDBANK
+BKFOLDER=$BKFOLDER""$SOUNDBANK
+echo $BKFOLDER
+
+### Set velocity and make the folder ###########################################
+
+echo 'Choose a velocity between 0 and 127'
+read y
+
+
+### define key range ###########################################################
+echo 'Choose the beginning key no. between 0 and 128'
+read a
+
+echo 'Choose the end key no. between 0 and 128'
+read b
+b=$[$b+1]
+### define sample length #######################################################
+echo 'Choose the sample length in integer seconds(i will do 13 seconds)'
+read time
+
+### Debug play #################################################################
+echo 'Do you want to play every note past conversation? This will double the duration.'
+echo 'yes or enter'
+read debug
+
+### Definition text file #######################################################
+echo "Writing definition file"
+echo "%midinote_%velocity.wav" > $SOUNDBANK/definition.txt
+
+### Working zone ###############################################################
+
+while [[ $a != $b ]]
+	do
+	### Fluidsynth #########################################################
+	filename=$a"_"$y
+	echo "start FluidSynth"
+	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
+	fluidsynth_is_running="" 
+	echo "wait for fluidsynth"
+	while [[ -z $fluidsynth_is_running ]]
+		do
+		printf "."
+		fluidsynth_is_running=$(pgrep fluidsynth > $SOUNDBANK/fluidsynth.pid && echo "1")
+	done
+	### Sendmidi ###########################################################
+	echo "wait for sendmidi"
+	sendmidi dev fluidsynth 2> /var/tmp/sendmidi_con
+	sle=$(cat /var/tmp/sendmidi_con)
+	while [[ $sle != "" ]]
+        	do
+	        echo "."
+	        sendmidi dev fluidsynth 2> /var/tmp/sendmidi_con
+	        sle=$(cat /var/tmp/sendmidi_con)
+	done
+
+	echo "Sending tone on key $a velocity $y for $time seconds"
+	sendmidi dev fluidsynth on $a $y
+	sleep $time
+	echo "kill fluidsynth"
+	killall fluidsynth
+	a=$[$a+1]
+	### Sox ################################################################	
+	echo "converting soundsample"
+	sox -r 44100 -c 2 -b 16  -e signed-integer $SOUNDBANK/temp.raw $SOUNDBANK/temp.wav
+	file_length=$(sox $SOUNDBANK/temp.wav -n stat 2>&1 |grep Length |sed -n 's#^Length (seconds):[^0-9]*\([0-9.]*\)$#\1#p')
+	z=$(echo "$file_length-$time" | bc)
+	echo "trim the file from $z"
+	sox $SOUNDBANK/temp.wav $SOUNDBANK/$filename.wav trim $z
+	rm $SOUNDBANK/temp.raw
+	echo "done"
+	if [[ $debug = "yes" ]]
+		then
+		play $SOUNDBANK/$filename.wav
+	fi
+done
+### cleaning files ##############################################################
+rm /var/tmp/Banks_
+rm $SOUNDBANK/temp.*
+unset BKFOLDER
+unset SOUNDBANK
+unset CHOOSEBANK
+unset time
+unset a
+unset b
+unset y
+unset z
+unset sle
+unset debug
