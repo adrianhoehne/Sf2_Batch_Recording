@@ -9,9 +9,9 @@ it is only a bash script for making some samples for the SamplerBox
 
 
 TODO
-	- are the incoming information from user correct?
-	- is the needed software installed?
-  	- more options to change file, add reverb and chorus
+- are the incoming information from user correct?
+- is the needed software installed?
+- more options to change file, add reverb and chorus
 
 
 Welcome Screen :)
