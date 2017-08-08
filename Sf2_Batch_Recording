@@ -27,7 +27,7 @@ printf "
 ! 											!
 ! You want have 127 notes in one velocity and every sample will have 14 seconds 	!
 !											!
-! 14 sec sample + 1 sec script x 128 samples / 60 sec = 32 Minutes !			!
+! 14 sec sample + 1 sec script x 127 samples / 60 sec = 32 Minutes !			!
 !											!
 ! Test it first with one or two notes							!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -87,7 +87,7 @@ while [[ $a != $b ]]
 	### Fluidsynth #########################################################
 	filename=$a"_"$y
 	echo "start FluidSynth"
-	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth $* -g 1 -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
+	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth -g 1 -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
 	fluidsynth_is_running="" 
 	echo "wait for fluidsynth"
 	while [[ -z $fluidsynth_is_running ]]
