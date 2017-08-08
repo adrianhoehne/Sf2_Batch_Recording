@@ -11,6 +11,7 @@ printf "TODO
 
 	- are the incoming information from user correct?
 	- is the needed software installed?
+	- options for fluidsynth
 "
 
 printf "
@@ -60,10 +61,10 @@ read y
 
 
 ### define key range ###########################################################
-echo 'Choose the beginning key no. between 0 and 128'
+echo 'Choose the beginning key no. between 0 and 127'
 read a
 
-echo 'Choose the end key no. between 0 and 128'
+echo 'Choose the end key no. between 0 and 127'
 read b
 b=$[$b+1]
 ### define sample length #######################################################
@@ -86,7 +87,7 @@ while [[ $a != $b ]]
 	### Fluidsynth #########################################################
 	filename=$a"_"$y
 	echo "start FluidSynth"
-	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
+	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth $* -g 1 -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
 	fluidsynth_is_running="" 
 	echo "wait for fluidsynth"
 	while [[ -z $fluidsynth_is_running ]]
