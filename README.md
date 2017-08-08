@@ -1,5 +1,5 @@
 # Sf2_Batch_Recording
-Script to make samples for SamplerBox from sf2
+Script to make samples for SamplerBox from sf2 for Mac OSX
 
 http://www.samplerbox.org/
 
@@ -7,9 +7,13 @@ Welcome to Sf2_Batch_Recording
 This script let you make some nice wave files from sf2 
 it is only a bash script for making some samples for the SamplerBox
 
-This is needed and have to work from everywhere in the console
+This is needed and have to work from everywhere in the console.
 
+- https://github.com/gbevin/SendMIDI
+- https://github.com/FluidSynth/fluidsynth
+- https://sox.sourceforge.io/
 
+you can install it yourself or via homebrew. I did it via homebrew.
 
 TODO
 - are the incoming information from user correct?
