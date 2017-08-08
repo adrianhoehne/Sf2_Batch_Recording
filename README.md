@@ -16,14 +16,13 @@ TODO
 
 Welcome Screen :)
 
+Please think before type. I do not catch up mistakes made by user at the momennt.
+In later releases i will do. But not yet.
+Note, this will take a long time. A simple example:
+ 
+This script needs about 1 second to run. Because of waiting till fluidsynth is started
+and sendmidi is connected. This will happen every note.
 
- Please think before type. I do not catch up mistakes made by user at the momennt.
- In later releases i will do. But not yet.
- Note, this will take a long time. A simple example:
- 
- This script needs about 1 second to run. Because of waiting till fluidsynth is started
- and sendmidi is connected. This will happen every note.
- 
- You want have 127 notes in one velocity and every sample will have 14 seconds
- 14 sec sample + 1 sec script x 127 samples / 60 sec = 32 Minutes
- Test it first with one or two notes
+You want have 127 notes in one velocity and every sample will have 14 seconds
+14 sec sample + 1 sec script x 127 samples / 60 sec = 32 Minutes
+Test it first with one or two notes
