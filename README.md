@@ -31,6 +31,7 @@ This script needs about 1 second to run. Because of waiting till fluidsynth is s
 and sendmidi is connected. This will happen every note.
 
 You want have 127 notes in one velocity and every sample will have 14 seconds
+
 14 sec sample + 1 sec script x 127 samples / 60 sec = 32 Minutes
 
 Test it first with one or two notes
