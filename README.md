@@ -16,11 +16,6 @@ This software is needed and has to work from everywhere in the console.
 
 you can install it yourself or via homebrew. I did it via homebrew.
 
-TODO
-- more options to change file, add reverb and chorus via sox
-- quick test play for the sox options
-- finer steps in gain
-
 HOW IT WORK
 
 Sendmidi will send a note to Fluidsynth. Fluidsynth will play the sound and record it to a 
