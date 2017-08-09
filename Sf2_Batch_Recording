@@ -1,24 +1,13 @@
 #!/bin/bash
+
 ################################################################################
 clear && printf "Welcome to Sf2_Batch_Recording 
 
 this script let you make some nice wave files from sf2 
-it is only a bash script for making some samples for the SamplerBox
+it is only a bash script for making some samples for the SamplerBox including definition
+text file. 
 
-"
-
-printf "TODO
-
-	- are the incoming information from user correct?
-	- is the needed software installed?
-	- options for fluidsynth
-"
-
-printf "
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!											!
-! Please think before type. I do not catch up mistakes made by user at the moment.	!
-! In later releases i will do. But not yet.						!	
 !											!
 ! Note, this will take a long time. A simple example:					!
 !											!
@@ -31,16 +20,37 @@ printf "
 !											!
 ! Test it first with one or two notes							!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-"
-#################################################################################
-printf"
-NEEDED:
 
-https://github.com/gbevin/SendMIDI
-https://github.com/FluidSynth/fluidsynth
-https://sox.sourceforge.io/
 
 "
+################################################################################
+
+### Some software tests #######################################################
+
+if [[ -z $(screen -v 2>&1 | sed '/command not found/d') ]]
+	then
+	echo "screen is not installed, try to install it via homebrew"
+	exit 0
+fi
+
+if [[ -z $(fluidsynth -V 2>&1 | sed '/command not found/d') ]]
+        then
+        echo "fluidsynth is not installed, try to install it via homebrew"
+        exit 0
+fi
+
+if [[ -z $(sendmidi --version  2>&1 | sed '/command not found/d') ]]
+        then
+        echo "sendmidi is not installed, try to install it via homebrew"
+        exit 0
+fi
+
+if [[ -z $(sox --version 2>&1 | sed '/command not found/d') ]]
+        then
+        echo "sox is not installed, try to install it via homebrew"
+        exit 0
+fi
+
 
 ### Set folder for banks, read content and ask user to choose one ##############
 
@@ -56,25 +66,69 @@ echo $BKFOLDER
 
 ### Set velocity and make the folder ###########################################
 
-echo 'Choose a velocity between 0 and 127'
-read y
+while [[ $y < 0 || $y > 127 ]]
+	do
+	echo 'Choose a velocity between 0 and 127 or press enter for 127'
+	read y
+	if [[ -z $y ]]
+		then
+		y=127
+	fi
+done
+echo "The velocity is set to $y"
 
 
 ### define key range ###########################################################
-echo 'Choose the beginning key no. between 0 and 127'
-read a
 
-echo 'Choose the end key no. between 0 and 127'
-read b
+while [[ $a < 0 || $a > 127 ]]
+	do
+	echo 'Choose the beginning key no. between 0 and 127 or press enter for 0'
+	read a
+	if [[ -z $a ]]
+		then
+		a=0
+	fi
+done
+echo "We will begin with key $a"
+
+while [[ $b < 0 || $b > 127 ]]
+	do
+	echo 'Choose the end key no. between 0 and 127 or press enter for 127'
+	read b
+	if [[ -z $b ]]
+		then
+		b=127
+	fi
+done
+echo "We will end with key $b"
+
 b=$[$b+1]
+
+
 ### define sample length #######################################################
-echo 'Choose the sample length in integer seconds(i will do 13 seconds)'
-read time
+
+while [[ $time < 1 ]]
+	do
+	echo 'Choose the sample length in full seconds(i will do 13 seconds)'
+	read time
+done
+echo "Sample length will be $time seconds"
 
 ### Debug play #################################################################
 echo 'Do you want to play every note past conversation? This will double the duration.'
 echo 'yes or enter'
 read debug
+
+### Fluidsynth Gain ############################################################
+while [[ $fgain < 0 || $fgain > 5 ]]
+	do
+	echo "please enter gain for fluidsynth between 0.1 and 5,  Or press enter for gain 1"
+	read fgain
+	if [[ -z $fgain ]]
+		then 
+		fgain=1
+	fi
+done
 
 ### Definition text file #######################################################
 echo "Writing definition file"
@@ -87,7 +141,7 @@ while [[ $a != $b ]]
 	### Fluidsynth #########################################################
 	filename=$a"_"$y
 	echo "start FluidSynth"
-	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth -g 1 -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
+	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth -g $fgain -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
 	fluidsynth_is_running="" 
 	echo "wait for fluidsynth"
 	while [[ -z $fluidsynth_is_running ]]
@@ -129,6 +183,7 @@ done
 ### cleaning files ##############################################################
 rm /var/tmp/Banks_
 rm $SOUNDBANK/temp.*
+rm $SOUNDBANK/fluidsynth.pid
 unset BKFOLDER
 unset SOUNDBANK
 unset CHOOSEBANK
@@ -139,3 +194,5 @@ unset y
 unset z
 unset sle
 unset debug
+unset fgain
+

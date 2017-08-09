@@ -12,19 +12,20 @@ This is needed and have to work from everywhere in the console.
 - https://github.com/gbevin/SendMIDI
 - https://github.com/FluidSynth/fluidsynth
 - https://sox.sourceforge.io/
+- screen command from the console. maybe you need the command line tools from xcode or you install it via homebrew
 
 you can install it yourself or via homebrew. I did it via homebrew.
 
 TODO
 - are the incoming information from user correct?
 - is the needed software installed?
-- more options to change file, add reverb and chorus
+- more options to change file, add reverb and chorus via sox
+- quick test play for the sox options
+
 
 
 Welcome Screen :)
 
-Please think before type. I do not catch up mistakes made by user at the momennt.
-In later releases i will do. But not yet.
 Note, this will take a long time. A simple example:
  
 This script needs about 1 second to run. Because of waiting till fluidsynth is started
