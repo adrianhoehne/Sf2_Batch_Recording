@@ -38,12 +38,13 @@ Test it first, with one or two notes.
 
 You will be asked at start and before conversation for:
 
-Velocity
-First Note
-Last Note
-Sample length 
-Gain
-Debugmode to hear the sound past conversation
+Velocity,
+First Note,
+Last Note,
+Sample length, 
+Gain,
+Debugmode to hear the sound past conversation,
+Effects (not released yet)
 
 I tested it with note 60. But you can choose whatever you want.
 
