@@ -21,7 +21,7 @@ TODO
 - is the needed software installed?
 - more options to change file, add reverb and chorus via sox
 - quick test play for the sox options
-
+- finer steps in gain
 
 HOW IT WORK
 
