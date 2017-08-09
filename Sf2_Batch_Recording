@@ -65,8 +65,8 @@ BKFOLDER=$BKFOLDER""$SOUNDBANK
 echo $BKFOLDER
 
 ### Set velocity and make the folder ###########################################
-
-while [[ $y < 0 || $y > 127 ]]
+y=-1
+while [[ "$y" -lt 0 || "$y" -gt 127 ]]
 	do
 	echo 'Choose a velocity between 0 and 127 or press enter for 127'
 	read y
@@ -79,8 +79,8 @@ echo "The velocity is set to $y"
 
 
 ### define key range ###########################################################
-
-while [[ $a < 0 || $a > 127 ]]
+a=-1
+while [[ "$a" -lt 0 || "$a" -gt 127 ]]
 	do
 	echo 'Choose the beginning key no. between 0 and 127 or press enter for 0'
 	read a
@@ -91,7 +91,8 @@ while [[ $a < 0 || $a > 127 ]]
 done
 echo "We will begin with key $a"
 
-while [[ $b < 0 || $b > 127 ]]
+b=-1
+while [[ "$b" -lt 0 || "$b" -gt 127 ]]
 	do
 	echo 'Choose the end key no. between 0 and 127 or press enter for 127'
 	read b
@@ -107,7 +108,7 @@ b=$[$b+1]
 
 ### define sample length #######################################################
 
-while [[ $time < 1 ]]
+while [[ "$time" -lt 1 ]]
 	do
 	echo 'Choose the sample length in full seconds(i will do 13 seconds)'
 	read time
@@ -120,7 +121,8 @@ echo 'yes or enter'
 read debug
 
 ### Fluidsynth Gain ############################################################
-while [[ $fgain < 0 || $fgain > 5 ]]
+fgain=-1
+while [[ "$fgain" -lt 0 || "$fgain" -gt 5 ]]
 	do
 	echo "please enter gain for fluidsynth between 0.1 and 5,  Or press enter for gain 1"
 	read fgain
@@ -136,26 +138,26 @@ echo "%midinote_%velocity.wav" > $SOUNDBANK/definition.txt
 
 ### Working zone ###############################################################
 
-while [[ $a != $b ]]
+while [[ "$a" != "$b" ]]
 	do
 	### Fluidsynth #########################################################
 	filename=$a"_"$y
 	echo "start FluidSynth"
 	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth -g $fgain -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
 	fluidsynth_is_running="" 
-	echo "wait for fluidsynth"
-	while [[ -z $fluidsynth_is_running ]]
+	printf "wait for fluidsynth"
+	while [[ -z "$fluidsynth_is_running" ]]
 		do
 		printf "."
 		fluidsynth_is_running=$(pgrep fluidsynth > $SOUNDBANK/fluidsynth.pid && echo "1")
 	done
 	### Sendmidi ###########################################################
-	echo "wait for sendmidi"
+	printf "wait for sendmidi"
 	sendmidi dev fluidsynth 2> /var/tmp/sendmidi_con
 	sle=$(cat /var/tmp/sendmidi_con)
-	while [[ $sle != "" ]]
+	while [[ "$sle" != "" ]]
         	do
-	        echo "."
+	        printf "."
 	        sendmidi dev fluidsynth 2> /var/tmp/sendmidi_con
 	        sle=$(cat /var/tmp/sendmidi_con)
 	done
