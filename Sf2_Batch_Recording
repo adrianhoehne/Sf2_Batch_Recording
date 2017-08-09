@@ -55,7 +55,7 @@ fi
 ### Set folder for banks, read content and ask user to choose one ##############
 
 BKFOLDER='/Library/Audio/Sounds/Banks/'
-ls $BKFOLDER > /var/tmp/Banks_
+ls $BKFOLDER | cut -d "." -f 1 > /var/tmp/Banks_
 cat -n /var/tmp/Banks_
 echo 'Choose a soundbank in integer:'
 read CHOOSEBANK
