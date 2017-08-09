@@ -35,3 +35,15 @@ You want have 127 notes in one velocity and every sample will have 14 seconds
 14 sec sample + 1 sec script x 127 samples / 60 sec = 32 Minutes
 
 Test it first, with one or two notes.
+
+You will be asked at start and before conversation for:
+
+Velocity
+First Note
+Last Note
+Sample length 
+Gain
+Debugmode to hear the sound past conversation
+
+I tested it with note 60. But you can choose whatever you want.
+
