@@ -29,25 +29,25 @@ text file.
 
 if [[ -z $(screen -v 2>&1 | sed '/command not found/d') ]]
 	then
-	printf "screen is not installed, try to install it via homebrew"
+	printf 'screen is not installed, try to install it via homebrew'
 	exit 0
 fi
 
 if [[ -z $(fluidsynth -V 2>&1 | sed '/command not found/d') ]]
         then
-        printf "fluidsynth is not installed, try to install it via homebrew"
+        printf 'fluidsynth is not installed, try to install it via homebrew'
         exit 0
 fi
 
 if [[ -z $(sendmidi --version  2>&1 | sed '/command not found/d') ]]
         then
-        printf "sendmidi is not installed, try to install it via homebrew"
+        printf 'sendmidi is not installed, try to install it via homebrew'
         exit 0
 fi
 
 if [[ -z $(sox --version 2>&1 | sed '/command not found/d') ]]
         then
-        printf "sox is not installed, try to install it via homebrew"
+        printf 'sox is not installed, try to install it via homebrew'
         exit 0
 fi
 
@@ -58,7 +58,7 @@ BKFOLDER='/Library/Audio/Sounds/Banks/'
 ls $BKFOLDER > /var/tmp/Banks_
 
 cat -n /var/tmp/Banks_
-printf 'Choose a soundbank in integer:'
+printf '\nChoose a soundbank in integer:'
 read CHOOSEBANK
 if [[ -z "$CHOOSEBANK" ]]
 	then
@@ -75,40 +75,40 @@ mkdir $SOUNDBANK
 y=-1
 while [[ "$y" -lt 0 || "$y" -gt 127 ]]
 	do
-	printf 'Choose a velocity between 0 and 127 or press enter for 127: '
+	printf '\nChoose a velocity between 0 and 127 or press enter for 127: '
 	read y
 	if [[ -z $y ]]
 		then
 		y=127
 	fi
 done
-printf "The velocity is set to $y\n\n"
+printf "The velocity is set to $y\n"
 
 
 ### define key range ###########################################################
 a=-1
 while [[ "$a" -lt 0 || "$a" -gt 127 ]]
 	do
-	printf 'Choose the beginning key no. between 0 and 127 or press enter for 0: '
+	printf '\nChoose the beginning key no. between 0 and 127 or press enter for 0: '
 	read a
 	if [[ -z $a ]]
 		then
 		a=0
 	fi
 done
-printf "We will begin with key $a\n\n"
+printf "We will begin with key $a\n"
 
 b=-1
 while [[ "$b" -lt 0 || "$b" -gt 127 ]]
 	do
-	printf 'Choose the end key no. between 0 and 127 or press enter for 127: '
+	printf '\nChoose the end key no. between 0 and 127 or press enter for 127: '
 	read b
 	if [[ -z $b ]]
 		then
 		b=127
 	fi
 done
-printf "We will end with key $b\n\n"
+printf "We will end with key $b\n"
 
 b=$[$b+1]
 
@@ -117,47 +117,56 @@ b=$[$b+1]
 
 while [[ "$time" -lt 1 ]]
 	do
-	printf 'Choose the sample length in full seconds(i will do 13 seconds): '
+	printf '\nChoose the sample length in full seconds(i will do 13 seconds): '
 	read time
 done
-printf "Sample length will be $time seconds\n\n"
+printf "Sample length will be $time seconds\n"
 
 ### Debug play #################################################################
-printf 'Do you want to play every note past conversation? This will double the duration.
+printf '\nDo you want to play every note past conversation? This will double the duration.
 1 or enter for no '
 read debug
 
 ### Fluidsynth Gain ############################################################
-fgain=-1
-while [[ "$fgain" -lt 0 || "$fgain" -gt 5 ]]
-	do
-	printf 'please enter gain for fluidsynth between 0 and 5,  Or press enter for gain 1: '
-	read fgain
-	if [[ -z $fgain ]]
-		then 
-		fgain=1
-	fi
-done
+printf '\nPlease enter gain for fluidsynth between 0 and 5,  Or press enter for gain 0.8: '
+read fgain
+if [[ -z $fgain ]]
+	then 
+	fgain=0.8
+fi
+printf "Gain is set to $fgain\n"
+
+### Sync Options ###############################################################
+printf '\nHere you can cut of the file from beginning. In my mac I have a litte bit silence
+on the beginning of the file for 0.1 second. That will be the default value if you press enter.
+But feel free to change it to your wish. But stay in a positive value. 
+Type a value or press enter for my default 0.1 seconds: '
+read sync
+if [[ -z $sync ]]
+	then
+	sync=0.1
+fi
+printf "\nOk. we will cut another $sync off of the file\n" 
 
 ### Effects ####################################################################
 EFFECTS_FOLDER='effects/'
 ls $EFFECTS_FOLDER > /var/tmp/effects_
 
 cat -n /var/tmp/effects_
-printf 'Choose an effect in integer:'
+printf '\nChoose an effect in integer:'
 read CHOOSE_EFFECT
 if [[ -z "$CHOOSE_EFFECT" ]]
         then
         EFFECTS=""
-	printf "recording without effects"
+	printf 'recording without effects.\n'
 else
 	EFFECTS=$(tail +$CHOOSE_EFFECT /var/tmp/effects_ | head -1)
-	printf "$EFFECTS will be used"
+	printf "$EFFECTS will be used.\n"
 fi
 
 
 ### Definition text file #######################################################
-printf "Writing definition file\n"
+printf 'Writing definition file\n'
 echo "%midinote_%velocity.wav" > $SOUNDBANK/definition.txt
 
 ### Working zone ###############################################################
@@ -166,21 +175,21 @@ while [[ "$a" != "$b" ]]
 	do
 	### Fluidsynth #########################################################
 	filename=$a"_"$y
-	printf "start FluidSynth"
+	printf 'start FluidSynth'
 	screen -d -m fluidsynth -g $fgain  -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
 	fluidsynth_is_running="" 	
 	while [[ -z "$fluidsynth_is_running" ]]
 		do
-		printf "."
+		printf '.'
 		fluidsynth_is_running=$(pgrep fluidsynth > $SOUNDBANK/fluidsynth.pid && echo "1")
 	done
 	### Sendmidi ###########################################################
-	printf "wait for sendmidi"
+	printf 'wait for sendmidi'
 	sendmidi dev fluidsynth 2> /var/tmp/sendmidi_con
 	sle=$(cat /var/tmp/sendmidi_con)
 	while [[ "$sle" != "" ]]
         	do
-	        printf "."
+	        printf '.'
 	        sendmidi dev fluidsynth 2> /var/tmp/sendmidi_con
 	        sle=$(cat /var/tmp/sendmidi_con)
 	done
@@ -188,24 +197,24 @@ while [[ "$a" != "$b" ]]
 	printf "sending tone -key $a -velocity $y for $time sec\n"
 	sendmidi dev fluidsynth on $a $y &
 	sleep $time
-	printf "kill fluidsynth..."
+	printf 'kill fluidsynth...'
 	killall fluidsynth
 	a=$[$a+1]
 	### Sox ################################################################	
-	printf "converting soundsample..."
+	printf 'converting soundsample...'
 	sox -r 44100 -c 2 -b 16  -e signed-integer $SOUNDBANK/temp.raw $SOUNDBANK/temp.wav
 	file_length=$(sox $SOUNDBANK/temp.wav -n stat 2>&1 |grep Length |sed -n 's#^Length (seconds):[^0-9]*\([0-9.]*\)$#\1#p')
-	z=$(echo "$file_length-$time" | bc)
-	echo "trim the file from $z"
+	z=$(echo "$file_length-$time+$sync" | bc)
+	printf "trim the file from $z "
 	sox $SOUNDBANK/temp.wav $SOUNDBANK/$filename.wav trim $z $(< effects/$EFFECTS) 
 	rm $SOUNDBANK/temp.raw
-	printf "done\n"
+	printf 'done\n'
 	if [[ $debug = 1 ]]
 		then
 		play $SOUNDBANK/$filename.wav
 	fi
 done
-killall caffeinate
+killall caffeinate &
 
 ### cleaning files ##############################################################
 
