@@ -124,7 +124,7 @@ printf "Sample length will be $time seconds\n\n"
 
 ### Debug play #################################################################
 printf 'Do you want to play every note past conversation? This will double the duration.
-yes or enter for no '
+1 or enter for no '
 read debug
 
 ### Fluidsynth Gain ############################################################
@@ -139,6 +139,23 @@ while [[ "$fgain" -lt 0 || "$fgain" -gt 5 ]]
 	fi
 done
 
+### Effects ####################################################################
+EFFECTS_FOLDER='effects/'
+ls $EFFECTS_FOLDER > /var/tmp/effects_
+
+cat -n /var/tmp/effects_
+printf 'Choose an effect in integer:'
+read CHOOSE_EFFECT
+if [[ -z "$CHOOSE_EFFECT" ]]
+        then
+        EFFECTS=""
+	printf "recording without effects"
+else
+	EFFECTS=$(tail +$CHOOSE_EFFECT /var/tmp/effects_ | head -1)
+	printf "$EFFECTS will be used"
+fi
+
+
 ### Definition text file #######################################################
 printf "Writing definition file\n"
 echo "%midinote_%velocity.wav" > $SOUNDBANK/definition.txt
@@ -150,8 +167,8 @@ while [[ "$a" != "$b" ]]
 	### Fluidsynth #########################################################
 	filename=$a"_"$y
 	printf "start FluidSynth"
-	screen -d -m fluidsynth -g $fgain -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
-	fluidsynth_is_running="" 
+	screen -d -m fluidsynth -g $fgain  -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
+	fluidsynth_is_running="" 	
 	while [[ -z "$fluidsynth_is_running" ]]
 		do
 		printf "."
@@ -169,7 +186,7 @@ while [[ "$a" != "$b" ]]
 	done
 
 	printf "sending tone -key $a -velocity $y for $time sec\n"
-	sendmidi dev fluidsynth on $a $y
+	sendmidi dev fluidsynth on $a $y &
 	sleep $time
 	printf "kill fluidsynth..."
 	killall fluidsynth
@@ -180,10 +197,10 @@ while [[ "$a" != "$b" ]]
 	file_length=$(sox $SOUNDBANK/temp.wav -n stat 2>&1 |grep Length |sed -n 's#^Length (seconds):[^0-9]*\([0-9.]*\)$#\1#p')
 	z=$(echo "$file_length-$time" | bc)
 	echo "trim the file from $z"
-	sox $SOUNDBANK/temp.wav $SOUNDBANK/$filename.wav trim $z
+	sox $SOUNDBANK/temp.wav $SOUNDBANK/$filename.wav trim $z $(< effects/$EFFECTS) 
 	rm $SOUNDBANK/temp.raw
 	printf "done\n"
-	if [[ $debug = "yes" ]]
+	if [[ $debug = 1 ]]
 		then
 		play $SOUNDBANK/$filename.wav
 	fi
