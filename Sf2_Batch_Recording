@@ -55,7 +55,8 @@ fi
 ### Set folder for banks, read content and ask user to choose one ##############
 
 BKFOLDER='/Library/Audio/Sounds/Banks/'
-ls $BKFOLDER | cut -d "." -f 1 > /var/tmp/Banks_
+ls $BKFOLDER > /var/tmp/Banks_
+
 cat -n /var/tmp/Banks_
 printf 'Choose a soundbank in integer:'
 read CHOOSEBANK
@@ -65,9 +66,10 @@ if [[ -z "$CHOOSEBANK" ]]
 	exit 0
 fi
 SOUNDBANK=$(tail +$CHOOSEBANK /var/tmp/Banks_ | head -1)
-mkdir $SOUNDBANK
 BKFOLDER=$BKFOLDER""$SOUNDBANK
 echo $BKFOLDER
+SOUNDBANK=$(echo $SOUNDBANK | cut -d "." -f 1 ) # this is a small fix to make the folder name more beautiful
+mkdir $SOUNDBANK
 
 ### Set velocity and make the folder ###########################################
 y=-1
@@ -148,7 +150,7 @@ while [[ "$a" != "$b" ]]
 	### Fluidsynth #########################################################
 	filename=$a"_"$y
 	printf "start FluidSynth"
-	screen -d -m /usr/local/Cellar/fluid-synth/1.1.6/bin/fluidsynth -g $fgain -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
+	screen -d -m fluidsynth -g $fgain -a file $BKFOLDER -o audio.file.name=$SOUNDBANK/temp.raw
 	fluidsynth_is_running="" 
 	while [[ -z "$fluidsynth_is_running" ]]
 		do
