@@ -161,7 +161,7 @@ printf "Writing definition file\n"
 echo "%midinote_%velocity.wav" > $SOUNDBANK/definition.txt
 
 ### Working zone ###############################################################
-
+caffeinate -dim &
 while [[ "$a" != "$b" ]]
 	do
 	### Fluidsynth #########################################################
@@ -205,7 +205,10 @@ while [[ "$a" != "$b" ]]
 		play $SOUNDBANK/$filename.wav
 	fi
 done
+killall caffeinate
+
 ### cleaning files ##############################################################
+
 rm /var/tmp/Banks_
 rm $SOUNDBANK/temp.*
 rm $SOUNDBANK/fluidsynth.pid

@@ -25,7 +25,12 @@ raw file. Sox will convert the raw file to a signed 16bit 2 Channel wav file.
 
 Welcome Screen :)
 
-Note, this will take a long time. A simple example:
+Note, this will take a long time and it will not really work when your mac goes to sleep.
+I will use caffeinate -dim for it. It will be automatically killed on end of the script 
+but if break the script with ctrl-c you have to kill caffeinate yourself.
+
+
+A simple example:
  
 This script needs about 1 second to run. Because of waiting till fluidsynth is started
 and sendmidi is connected. This will happen every note.
