@@ -1,0 +1,110 @@
+#!/bin/bash
+
+### Values ##################################################
+
+a=20
+b=60
+c=12
+d=5
+e=3
+f=2
+g=0
+
+### Decription ##############################################
+
+
+### Function preload ########################################
+function preload {
+EFFECTS_FOLDER='effect_desc/'
+ls $EFFECTS_FOLDER > /var/tmp/effect_maker
+
+cat -n /var/tmp/effect_maker
+printf '\nChoose an effect in integer:'
+read CHOOSE_EFFECT
+EFFECT_NAME=$(tail +$CHOOSE_EFFECT /var/tmp/effect_maker | head -1)
+printf "$EFFECT_NAME will be used.\n"
+EFFECT=$( cat $EFFECTS_FOLDER""$EFFECT_NAME)
+VAL=( $EFFECT )
+
+### A ###
+if [[ -z ${VAL[0]} ]]; then A="-"; a=0;
+else A=${VAL[0]}; a_max=${VAL[1]}; fi
+### B ###
+if [[ -z ${VAL[2]} ]]; then B="-"; b=0;
+else B=${VAL[2]}; b_max=${VAL[3]}; fi
+### C ###
+if [[ -z ${VAL[4]} ]]; then C="-"; c=0;
+else C=${VAL[4]}; c_max=${VAL[5]}; fi
+### D ###
+if [[ -z ${VAL[6]} ]]; then D="-"; d=0;
+else D=${VAL[6]}; d_max=${VAL[7]}; fi
+### E ###
+if [[ -z ${VAL[8]} ]]; then E="-"; e=0;
+else E=${VAL[8]}; e_max=${VAL[9]}; fi
+### F ###
+if [[ -z ${VAL[10]} ]]; then F="-"; f=0;
+else F=${VAL[10]}; f_max=${VAL[11]}; fi
+### G ###
+if [[ -z ${VAL[12]} ]]; then G="-"; g=0;
+else G=${VAL[12]}; g_max=${VAL[13]}; fi
+
+
+}
+### Function gui_balken #####################################
+function gui_balken {
+i=0
+max=$2
+if [[ "$1" -lt 10 ]]; then printf "  "; elif [[ "$1" -lt 100 ]]; then printf " "; fi
+
+printf " $1 "
+printf '['
+while [[ "$i" -lt "$1" ]]; do
+	printf "O"
+	i=$[$i+1]
+done
+while [[ "$i" -lt "$max" ]]; do
+	printf "."
+	i=$[$i+1]
+
+done
+unset i
+unset max
+unset pos
+if [[ "$2" -lt 10 ]]; then printf "  "; elif [[ "$2" -lt 100 ]]; then printf " "; fi
+printf ']'"$2"'\n'
+}
+
+### Function gui_text #####################################
+function gui_text {
+pos=$(echo "$1" |wc -m )
+max=15
+printf "$1"
+while [[ "pos" -lt "max" ]]; do
+	printf " "
+	pos=$[$pos+1]
+done
+unset pos
+unset max
+}
+
+### Function header ########################################
+
+### Function footer ########################################
+
+### Function build gui #####################################
+
+function build_gui {
+
+if [[ $A != "-" ]]; then gui_text $A; gui_balken $a $a_max; fi
+if [[ $B != "-" ]]; then gui_text $B; gui_balken $b $b_max; fi
+if [[ $C != "-" ]]; then gui_text $C; gui_balken $c $c_max; fi
+if [[ $D != "-" ]]; then gui_text $D; gui_balken $d $d_max; fi
+if [[ $E != "-" ]]; then gui_text $E; gui_balken $e $e_max; fi
+if [[ $F != "-" ]]; then gui_text $F; gui_balken $f $f_max; fi
+if [[ $G != "-" ]]; then gui_text $G; gui_balken $g $g_max; fi
+}
+
+### Working zone ########################################
+clear
+preload
+build_gui
