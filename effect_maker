@@ -2,13 +2,16 @@
 
 ### Values ##################################################
 
-a=20
-b=60
-c=12
-d=5
-e=3
-f=2
+a=0
+b=0
+c=0
+d=0
+e=0
+f=0
 g=0
+h=0
+i=0
+j=0
 
 ### Decription ##############################################
 
@@ -47,6 +50,16 @@ else F=${VAL[10]}; f_max=${VAL[11]}; fi
 ### G ###
 if [[ -z ${VAL[12]} ]]; then G="-"; g=0;
 else G=${VAL[12]}; g_max=${VAL[13]}; fi
+### H ###
+if [[ -z ${VAL[14]} ]]; then H="-"; h=0;
+else H=${VAL[14]}; h_max=${VAL[15]}; fi
+### I ###
+if [[ -z ${VAL[16]} ]]; then I="-"; i=0;
+else I=${VAL[16]}; i_max=${VAL[17]}; fi
+### J  ###
+if [[ -z ${VAL[18]} ]]; then J="-"; j=0;
+else J=${VAL[18]}; j_max=${VAL[19]}; fi
+
 
 
 }
@@ -77,7 +90,7 @@ printf ']'"$2"'\n'
 ### Function gui_text #####################################
 function gui_text {
 pos=$(echo "$1" |wc -m )
-max=15
+max=20
 printf "$1"
 while [[ "pos" -lt "max" ]]; do
 	printf " "
@@ -91,20 +104,72 @@ unset max
 
 ### Function footer ########################################
 
+function footer {
+printf "
+
+$error1"
+}
+
 ### Function build gui #####################################
 
 function build_gui {
 
-if [[ $A != "-" ]]; then gui_text $A; gui_balken $a $a_max; fi
-if [[ $B != "-" ]]; then gui_text $B; gui_balken $b $b_max; fi
-if [[ $C != "-" ]]; then gui_text $C; gui_balken $c $c_max; fi
-if [[ $D != "-" ]]; then gui_text $D; gui_balken $d $d_max; fi
-if [[ $E != "-" ]]; then gui_text $E; gui_balken $e $e_max; fi
-if [[ $F != "-" ]]; then gui_text $F; gui_balken $f $f_max; fi
-if [[ $G != "-" ]]; then gui_text $G; gui_balken $g $g_max; fi
+if [[ "$A" != "-" ]]; then gui_text $A; gui_balken $a $a_max; else unset a; fi
+if [[ "$B" != "-" ]]; then gui_text $B; gui_balken $b $b_max; else unset b; fi
+if [[ "$C" != "-" ]]; then gui_text $C; gui_balken $c $c_max; else unset c; fi
+if [[ "$D" != "-" ]]; then gui_text $D; gui_balken $d $d_max; else unset d; fi
+if [[ "$E" != "-" ]]; then gui_text $E; gui_balken $e $e_max; else unset e; fi
+if [[ "$F" != "-" ]]; then gui_text $F; gui_balken $f $f_max; else unset f; fi
+if [[ "$G" != "-" ]]; then gui_text $G; gui_balken $g $g_max; else unset g; fi
+if [[ "$H" != "-" ]]; then gui_text $H; gui_balken $h $h_max; else unset h; fi
+if [[ "$I" != "-" ]]; then gui_text $I; gui_balken $i $i_max; else unset i; fi
+if [[ "$J" != "-" ]]; then gui_text $J; gui_balken $j $j_max; else unset j; fi
 }
 
-### Working zone ########################################
+
+### Function sox_play #####################################
+function sox_play {
+
+killall play
+play -q test.wav $EFFECT_NAME $a $b $c $d $e $f $g $h $i &
+
+}
+
+### Function KeyPress #####################################
+
+function keypress {
+  if [[ "$1" = "q" ]]; then stop=1
+elif [[ "$1" = "p" ]]; then sox_play
+elif [[ "$1" = "a" && "$a" -lt "$a_max" ]]; then a=$[$a+1] 
+elif [[ "$1" = "y" && "$a" -gt "0" ]]; then a=$[$a-1] 
+elif [[ "$1" = "s" && "$b" -lt "$b_max" ]]; then b=$[$b+1]
+elif [[ "$1" = "x" && "$b" -gt "0" ]]; then b=$[$b-1] 
+elif [[ "$1" = "d" && "$c" -lt "$c_max" ]]; then c=$[$c+1]
+elif [[ "$1" = "c" && "$c" -gt "0" ]]; then c=$[$c-1] 
+elif [[ "$1" = "f" && "$d" -lt "$d_max" ]]; then d=$[$d+1]
+elif [[ "$1" = "v" && "$d" -gt "0" ]]; then d=$[$d-1] 
+elif [[ "$1" = "g" && "$e" -lt "$e_max" ]]; then e=$[$e+1]
+elif [[ "$1" = "b" && "$e" -gt "0" ]]; then e=$[$e-1] 
+elif [[ "$1" = "h" && "$f" -lt "$f_max" ]]; then f=$[$f+1]
+elif [[ "$1" = "n" && "$f" -gt "0" ]]; then f=$[$f-1] 
+elif [[ "$1" = "j" && "$g" -lt "$g_max" ]]; then g=$[$g+1] 
+elif [[ "$1" = "m" && "$g" -gt "0" ]]; then g=$[$g-1]
+elif [[ "$1" = "k" && "$h" -lt "$h_max" ]]; then h=$[$h+1]
+elif [[ "$1" = "," && "$h" -gt "0" ]]; then h=$[$h-1]
+elif [[ "$1" = "l" && "$i" -lt "$i_max" ]]; then i=$[$i+1]
+elif [[ "$1" = "." && "$i" -gt "0" ]]; then i=$[$i-1]
+elif [[ "$1" = "ö" && "j" -lt "$j_max" ]]; then j=$[$j+1]
+elif [[ "$1" = "-" && "$j" -gt "0" ]]; then j=$[$j-1]
+fi
+}
+
+### Working zone ##########################################
 clear
 preload
-build_gui
+stop=0
+while [[ "$stop" = 0 ]]; do
+	build_gui
+	read -n 1 key
+	keypress $key
+	clear
+done

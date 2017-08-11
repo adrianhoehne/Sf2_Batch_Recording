@@ -2,7 +2,10 @@
 Script to make samples for SamplerBox from sf2 for Mac OSX
 
 http://www.samplerbox.org/
-https://github.com/josephernest/SamplerBox
+
+# effect_maker
+Script to test sox effects and save it for use with Sf2_Batch_Recording
+More information below
 
 Welcome to Sf2_Batch_Recording 
 This script let you make some wave files from sf2.
@@ -49,7 +52,11 @@ Last Note,
 Sample length, 
 Gain,
 Debugmode to hear the sound past conversation,
-Effects (not released yet)
+Effects
 
 I tested it with note 60. But you can choose whatever you want.
 
+# effect_maker
+
+You can try and play with effects from Sox.
+If you are happy with that effect you can save it and use it with Sf2_Batch_Recording and generate your wav samples including effects.
