@@ -13,6 +13,17 @@ h=0
 i=0
 j=0
 
+bank_1="leer"
+bank_2="leer"
+bank_3="leer"
+bank_4="leer"
+bank_5="leer"
+bank_6="leer"
+bank_7="leer"
+bank_8="leer"
+bank_9="leer"
+bank_10="leer"
+
 ### Decription ##############################################
 
 
@@ -26,9 +37,20 @@ printf '\nChoose an effect in integer:'
 read CHOOSE_EFFECT
 EFFECT_NAME=$(tail +$CHOOSE_EFFECT /var/tmp/effect_maker | head -1)
 printf "$EFFECT_NAME will be used.\n"
+
+  if [[ $1 = 1 ]]; then bank_1=$EFFECT_NAME
+elif [[ $1 = 2 ]]; then bank_2=$EFFECT_NAME
+elif [[ $1 = 3 ]]; then bank_3=$EFFECT_NAME
+elif [[ $1 = 4 ]]; then bank_4=$EFFECT_NAME
+elif [[ $1 = 5 ]]; then bank_5=$EFFECT_NAME
+elif [[ $1 = 6 ]]; then bank_6=$EFFECT_NAME
+elif [[ $1 = 7 ]]; then bank_7=$EFFECT_NAME
+elif [[ $1 = 8 ]]; then bank_8=$EFFECT_NAME
+elif [[ $1 = 9 ]]; then bank_9=$EFFECT_NAME
+elif [[ $1 = 10 ]]; then bank_10=$EFFECT_NAME; fi
+
 EFFECT=$( cat $EFFECTS_FOLDER""$EFFECT_NAME)
 VAL=( $EFFECT )
-
 ### A ###
 if [[ -z ${VAL[0]} ]]; then A="-"; a=0;
 else A=${VAL[0]}; a_max=${VAL[1]}; fi
@@ -60,15 +82,14 @@ else I=${VAL[16]}; i_max=${VAL[17]}; fi
 if [[ -z ${VAL[18]} ]]; then J="-"; j=0;
 else J=${VAL[18]}; j_max=${VAL[19]}; fi
 
-
-
+unset VAL
+unset CHOOSE_EFFECT
 }
 ### Function gui_balken #####################################
 function gui_balken {
 i=0
 max=$2
 if [[ "$1" -lt 10 ]]; then printf "  "; elif [[ "$1" -lt 100 ]]; then printf " "; fi
-
 printf " $1 "
 printf '['
 while [[ "$i" -lt "$1" ]]; do
@@ -78,20 +99,30 @@ done
 while [[ "$i" -lt "$max" ]]; do
 	printf "."
 	i=$[$i+1]
-
 done
+
+if [[ "$max" -lt 10 ]]; then printf "  "; elif [[ "$max" -lt 100 ]]; then printf " "; fi
+printf ']'"$max"
+i=0
+iy=107
+ix=$[$iy-$max]
+while [[ "$i" -lt "$ix" ]]; do
+	printf " "
+	i=$[$i+1]
+done
+printf "#\n"
 unset i
+unset iy
+unset ix
 unset max
 unset pos
-if [[ "$2" -lt 10 ]]; then printf "  "; elif [[ "$2" -lt 100 ]]; then printf " "; fi
-printf ']'"$2"'\n'
 }
 
 ### Function gui_text #####################################
 function gui_text {
 pos=$(echo "$1" |wc -m )
 max=20
-printf "$1"
+printf "#  $1"
 while [[ "pos" -lt "max" ]]; do
 	printf " "
 	pos=$[$pos+1]
@@ -100,20 +131,62 @@ unset pos
 unset max
 }
 
-### Function header ########################################
+### Function gui_bank ########################################
+function gui_bank {
+printf "  1."; gui_text $bank_1
+printf "  2."; gui_text $bank_2
+printf "  3."; gui_text $bank_3
+printf "  4."; gui_text $bank_4
+printf "  5."; gui_text $bank_5; printf "\n"
+printf "  6."; gui_text $bank_6
+printf "  7."; gui_text $bank_7
+printf "  8."; gui_text $bank_8
+printf "  9."; gui_text $bank_9
+printf " 10."; gui_text $bank_10; printf "\n"
+}
 
+### Function line and linebreak ##############################
+function line {
+        i=0
+        while [[ "$i" -lt 140 ]]; do
+                printf "#"
+                i=$[$i+1]
+        done
+        printf "\n"
+	unset i
+}
+function lbr {
+	i=0
+	printf "#"
+        while [[ "$i" -lt 138 ]]; do
+                printf " "
+                i=$[$i+1]
+        done
+	printf "#\n"
+	unset i
+}
+### Function header ########################################
+function header {
+	line
+	lbr
+	gui_bank
+	lbr
+	line
+}
 ### Function footer ########################################
 
 function footer {
-printf "
-
-$error1"
+	line
+	lbr
+	printf "$error1\n"
+	lbr
+	line
 }
 
 ### Function build gui #####################################
 
 function build_gui {
-
+lbr
 if [[ "$A" != "-" ]]; then gui_text $A; gui_balken $a $a_max; else unset a; fi
 if [[ "$B" != "-" ]]; then gui_text $B; gui_balken $b $b_max; else unset b; fi
 if [[ "$C" != "-" ]]; then gui_text $C; gui_balken $c $c_max; else unset c; fi
@@ -124,6 +197,7 @@ if [[ "$G" != "-" ]]; then gui_text $G; gui_balken $g $g_max; else unset g; fi
 if [[ "$H" != "-" ]]; then gui_text $H; gui_balken $h $h_max; else unset h; fi
 if [[ "$I" != "-" ]]; then gui_text $I; gui_balken $i $i_max; else unset i; fi
 if [[ "$J" != "-" ]]; then gui_text $J; gui_balken $j $j_max; else unset j; fi
+lbr
 }
 
 
@@ -140,6 +214,16 @@ play -q test.wav $EFFECT_NAME $a $b $c $d $e $f $g $h $i &
 function keypress {
   if [[ "$1" = "q" ]]; then stop=1
 elif [[ "$1" = "p" ]]; then sox_play
+elif [[ "$1" = 1 ]]; then preload 1
+elif [[ "$1" = 2 ]]; then preload 2
+elif [[ "$1" = 3 ]]; then preload 3
+elif [[ "$1" = 4 ]]; then preload 4
+elif [[ "$1" = 5 ]]; then preload 5
+elif [[ "$1" = 6 ]]; then preload 6
+elif [[ "$1" = 7 ]]; then preload 7
+elif [[ "$1" = 8 ]]; then preload 8
+elif [[ "$1" = 9 ]]; then preload 9
+elif [[ "$1" = 10 ]]; then preload 10
 elif [[ "$1" = "a" && "$a" -lt "$a_max" ]]; then a=$[$a+1] 
 elif [[ "$1" = "y" && "$a" -gt "0" ]]; then a=$[$a-1] 
 elif [[ "$1" = "s" && "$b" -lt "$b_max" ]]; then b=$[$b+1]
@@ -165,10 +249,13 @@ fi
 
 ### Working zone ##########################################
 clear
-preload
+preload 1
+clear
 stop=0
 while [[ "$stop" = 0 ]]; do
+	header
 	build_gui
+	footer
 	read -n 1 key
 	keypress $key
 	clear
