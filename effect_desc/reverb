@@ -1,6 +1,6 @@
-reverberance 100
-HF-damping 100
-room-scale 100
-stereo-depth 100
-pre-delay 10
-wet-gain 10
+reverberance 100 1 0
+HF-damping 100 1 0
+room-scale 100 1 0
+stereo-depth 100 1 0
+pre-delay 10 1 0
+wet-gain 10 1 0	
