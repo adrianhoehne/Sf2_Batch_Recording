@@ -4,6 +4,7 @@
 
 user_values=("0" "0" "0" "0" "0" "0" "0" "0" "0" "0" )
 bank_effect=("leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer")
+bank_key=("a" "y" "s" "x" "d" "c" "f" "v" "g" "b" "h" "n" "j" "m" "k" "," "l" "." "ö" "-")
 
 ### Decription ##############################################
 
@@ -47,9 +48,9 @@ unset CHOOSE_EFFECT
 }
 ### Function gui_balken #####################################
 function gui_balken {
-if [[ "$1" -lt 10 ]]; then 
+if [[ $(echo "$1 < 10" |bc -q) ]]; then 
 	printf "  "
-elif [[ "$1" -lt 100 ]]; 
+elif [[ $( echo "$1 < 100" |bc -q ) ]]; 
 	then printf " "
 fi
 printf " $1  $2 Step size $3"
@@ -147,7 +148,6 @@ while [[ "$i" -lt "$index" ]]; do
 	gui_balken "${user_values[$i]}" "${max_values[$i]}" "${step_size[$i]}"
 	i=$[$i+1]
 done
-error1=${effect_options}' '"$index"
 lbr
 unset i
 unset index
@@ -160,13 +160,20 @@ temp_effect="$EFFECT_NAME"
 i=0
 index="${#effect_options[*]}" 
 while [[ "$i" -lt "$index" ]]; do
-	temp_effect="$temp_effect"' '"${user_values[$i]}"
+	if [[ $( echo "${user_values[$i]} < 1 " |bc ) -eq "1" ]]; then
+		usr_values='0'"${user_values[$i]}"
+	else
+		usr_values="${user_values[$i]}"
+	fi
+	temp_effect="$temp_effect"' '"$usr_values"
 	i=$[$i+1]
 done
 echo $temp_effect > temp.effect
 killall play
 play -q test.wav $( cat temp.effect) &
-
+unset i
+unset index
+unset usr_values
 }
 
 ### Function KeyPress #####################################
@@ -189,29 +196,26 @@ elif [[ "$1" = 7 ]]; then preload 7
 elif [[ "$1" = 8 ]]; then preload 8
 elif [[ "$1" = 9 ]]; then preload 9
 elif [[ "$1" = 10 ]]; then preload 10
-elif [[ "$1" = "a" && "${user_values[0]}" -lt "${max_values[0]}" ]]; then user_values[0]=$[${user_values[0]}+${step_size[0]}] 
-elif [[ "$1" = "y" && "${user_values[0]}" -gt "0" ]]; then user_values[0]=$[${user_values[0]}-${step_size[0]}] 
-elif [[ "$1" = "s" && "${user_values[1]}" -lt "${max_values[1]}" ]]; then user_values[1]=$[${user_values[1]}+${step_size[1]}]
-elif [[ "$1" = "x" && "${user_values[1]}" -gt "0" ]]; then user_values[1]=$[${user_values[1]}-${step_size[1]}]
-elif [[ "$1" = "d" && "${user_values[2]}" -lt "${max_values[2]}" ]]; then user_values[2]=$[${user_values[2]}+${step_size[2]}]
-elif [[ "$1" = "c" && "${user_values[2]}" -gt "0" ]]; then user_values[2]=$[${user_values[2]}-${step_size[2]}]
-elif [[ "$1" = "f" && "${user_values[3]}" -lt "${max_values[3]}" ]]; then user_values[3]=$[${user_values[3]}+${step_size[3]}]
-elif [[ "$1" = "v" && "${user_values[3]}" -gt "0" ]]; then user_values[3]=$[${user_values[3]}-${step_size[3]}]
-elif [[ "$1" = "g" && "${user_values[4]}" -lt "${max_values[4]}" ]]; then user_values[4]=$[${user_values[4]}+${step_size[4]}]
-elif [[ "$1" = "b" && "${user_values[4]}" -gt "0" ]]; then user_values[4]=$[${user_values[4]}-${step_size[4]}]
-elif [[ "$1" = "h" && "${user_values[5]}" -lt "${max_values[5]}" ]]; then user_values[5]=$[${user_values[5]}+${step_size[5]}]
-elif [[ "$1" = "n" && "${user_values[5]}" -gt "0" ]]; then user_values[5]=$[${user_values[5]}-${step_size[5]}]
-elif [[ "$1" = "j" && "${user_values[6]}" -lt "${max_values[6]}" ]]; then user_values[6]=$[${user_values[6]}+${step_size[6]}]
-elif [[ "$1" = "m" && "${user_values[6]}" -gt "0" ]]; then user_values[6]=$[${user_values[6]}-${step_size[6]}]
-elif [[ "$1" = "k" && "${user_values[7]}" -lt "${max_values[7]}" ]]; then user_values[7]=$[${user_values[7]}+${step_size[7]}]
-elif [[ "$1" = "," && "${user_values[7]}" -gt "0" ]]; then user_values[7]=$[${user_values[7]}-${step_size[7]}]
-elif [[ "$1" = "l" && "${user_values[8]}" -lt "${max_values[8]}" ]]; then user_values[8]=$[${user_values[8]}+${step_size[8]}]
-elif [[ "$1" = "." && "${user_values[8]}" -gt "0" ]]; then user_values[8]=$[${user_values[8]}-${step_size[8]}]
-elif [[ "$1" = "ö" &&"${user_values[9]}" -lt "${max_values[9]}" ]]; then user_values[9]=$[${user_values[9]}+${step_size[9]}]
-elif [[ "$1" = "-" && "${user_values[9]}" -gt "0" ]]; then user_values[9]=$[${user_values[9]}-${step_size[9]}]
 fi
-}
 
+i=0
+y=0
+index=${#bank_key[*]}
+while [[ "$i" -lt "$index" ]]; do
+	if [[ "$1" = "${bank_key[$i]}" ]]; then
+		if [[ $( echo "$i % 2" | bc ) -eq "0" ]]; then
+		        if [[ $( echo "${user_values[$y]} < ${max_values[$y]}" |bc ) -eq "1" ]]; then user_values[$y]=$( echo "${user_values[$y]}+${step_size[$y]}" | bc ); fi
+		else
+		        if [[ $( echo "${user_values[$y]} > 0" |bc ) -eq "1" ]]; then user_values[$y]=$( echo "${user_values[$y]}-${step_size[$y]}" | bc ); fi
+		fi
+		break
+	fi
+	i=$[$i+1]
+	if [[ $( echo "$i % 2" | bc ) -eq "0" ]]; then y=$[$y+1]; fi
+done
+unset i
+unset index
+}
 ### Working zone ##########################################
 clear
 stop=0
