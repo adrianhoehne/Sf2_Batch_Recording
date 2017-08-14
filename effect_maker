@@ -48,12 +48,9 @@ unset CHOOSE_EFFECT
 }
 ### Function gui_balken #####################################
 function gui_balken {
-if [[ $(echo "$1 < 10" |bc -q) ]]; then 
-	printf "  "
-elif [[ $( echo "$1 < 100" |bc -q ) ]]; 
-	then printf " "
-fi
-printf " $1  $2 Step size $3"
+display_var_as_block "$1" "12"
+display_var_as_block "$2" "12"
+display_var_as_block "$3" "12"
 printf "#\n"
 }
 
@@ -93,7 +90,10 @@ unset y
 unset transport
 }
 
-### Function line and linebreak ##############################
+### Function 
+### line ()
+### linebreak () 
+### display_var_as_block (var, blocksize)
 function line {
         i=0
         while [[ "$i" -lt 100 ]]; do
@@ -113,6 +113,16 @@ function lbr {
 	printf "#\n"
 	unset i
 }
+function display_var_as_block {
+printf "$1"
+pos=$( echo "$1" | wc -m )
+while [[ "$pos" -lt "$2" ]]; do
+        printf " "
+	pos=$[$pos+1]
+done
+unset pos
+}
+
 ### Function header ########################################
 function header {
 	line
@@ -140,7 +150,8 @@ lbr
 # user_values=(0 0 0 0 0 0 0 0 0 0 )
 # max_values=()
 # step_size=(
-
+gui_text "Name"
+gui_balken "Position" "Max Value" "Step Size"
 i=0
 index="${#effect_options[*]}"
 while [[ "$i" -lt "$index" ]]; do
