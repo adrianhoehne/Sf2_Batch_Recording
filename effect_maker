@@ -4,30 +4,59 @@
 
 user_values=("0" "0" "0" "0" "0" "0" "0" "0" "0" "0" )
 bank_effect=("leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer")
-bank_key=("a" "y" "s" "x" "d" "c" "f" "v" "g" "b" "h" "n" "j" "m" "k" "," "l" "." "ö" "-")
+option_key=("a" "y" "s" "x" "d" "c" "f" "v" "g" "b" "h" "n" "j" "m" "k" "," "l" "." "ö" "-")
+control_key=("r" "u" "o" "1-9" "p")
+control_key_desc=("Reset Values" "Load Values" "Save Values" "Load Bank" "Play Testsound")
 
-### Decription ##############################################
+
+### function load ###############################################
+function load_user_values {
+if [[ -e savenload/$EFFECT_NAME ]]; then 
+	load_values=( $( cat savenload/$EFFECT_NAME ) )
+	error1=${#load_values[*]}
+	i=1
+	index="${#load_values[*]}"
+	while [[ "$i" -lt "$index" ]]; do
+		user_values[$i-1]="${load_values[$i]}"
+		i=$[$i+1]
+	done
+fi
+} 
+
+### funktion save  ##############################################
+function save {
+echo "save now"
+temp_effect="$EFFECT_NAME"
+i=0
+index="${#effect_options[*]}"
+while [[ "$i" -lt "$index" ]]; do
+        if [[ $( echo "${user_values[$i]} < 1 " |bc ) -eq "1" && $( echo "${user_values[$i]} > 0 " |bc ) -eq "1" ]]; then
+                usr_values='0'"${user_values[$i]}"
+        else
+                usr_values="${user_values[$i]}"
+        fi
+        temp_effect="$temp_effect"' '"$usr_values"
+        i=$[$i+1]
+done
+echo $temp_effect > "savenload/$EFFECT_NAME"
+unset i
+unset index
+unset usr_values
+}
 
 
 ### Function preload ########################################
 function preload {
+
 EFFECTS_FOLDER='effect_desc/'
 ls $EFFECTS_FOLDER > /var/tmp/effect_maker
-
 cat -n /var/tmp/effect_maker
 printf '\nChoose an effect in integer :'
 read CHOOSE_EFFECT
 EFFECT_NAME=$(tail +$CHOOSE_EFFECT /var/tmp/effect_maker | head -1)
 
 bank_effect[$1-1]=$EFFECT_NAME
-
 EFFECT=( $( cat $EFFECTS_FOLDER""$EFFECT_NAME ) )
-
-# reminder
-# effect_options=()
-# user_values=(0 0 0 0 0 0 0 0 0 0 )
-# max_values=()
-# step_size=()
 
 index="${#EFFECT[*]}"
 i=0
@@ -51,6 +80,9 @@ function gui_balken {
 display_var_as_block "$1" "12"
 display_var_as_block "$2" "12"
 display_var_as_block "$3" "12"
+display_var_as_block "$4" "4"
+display_var_as_block "$5" "4"
+
 printf "#\n"
 }
 
@@ -90,10 +122,24 @@ unset y
 unset transport
 }
 
-### Function 
-### line ()
-### linebreak () 
-### display_var_as_block (var, blocksize)
+### Function keydescriptions ################################
+function key_desc {
+	i=0
+	index="${#control_key[*]}"
+	while [[ "$i" -lt "$index" ]]; do
+		display_var_as_block "   < ${control_key[$i]} >" "5"
+		display_var_as_block "${control_key_desc[$i]}" "15"
+		if [[ $( echo "( $i + 1 ) % 4" | bc  ) -eq 0 ]]; then 
+			 printf "\n"
+		fi
+		i=$[$i+1]
+	done
+printf "\n"
+unset i
+unset index
+}
+
+### Function line ###########################################
 function line {
         i=0
         while [[ "$i" -lt 100 ]]; do
@@ -103,6 +149,8 @@ function line {
         printf "\n"
 	unset i
 }
+
+### Function lbr ############################################
 function lbr {
 	i=0
 	printf "#"
@@ -113,6 +161,8 @@ function lbr {
 	printf "#\n"
 	unset i
 }
+
+### Funtion display_var_as_block (var, blocksize) ##########
 function display_var_as_block {
 printf "$1"
 pos=$( echo "$1" | wc -m )
@@ -136,7 +186,9 @@ function header {
 function footer {
 	line
 	lbr
-	printf " $error1 \n"
+	key_desc
+	lbr
+	printf "   Message for you: $error1 \n"
 	lbr
 	line
 }
@@ -151,15 +203,17 @@ lbr
 # max_values=()
 # step_size=(
 gui_text "Name"
-gui_balken "Position" "Max Value" "Step Size"
+gui_balken "Position" "Max Value" "Step Size" "+" "-"
 i=0
 index="${#effect_options[*]}"
 while [[ "$i" -lt "$index" ]]; do
 	gui_text "${effect_options[$i]}"
-	gui_balken "${user_values[$i]}" "${max_values[$i]}" "${step_size[$i]}"
+	gui_balken "${user_values[$i]}" "${max_values[$i]}" "${step_size[$i]}" "${option_key[$y]}" "${option_key[$y+1]}"
 	i=$[$i+1]
+	y=$[$y+2]
 done
 lbr
+unset y
 unset i
 unset index
 }
@@ -197,6 +251,7 @@ unset usr_values
 function keypress {
   if [[ "$1" = "q" ]]; then stop=1
 elif [[ "$1" = "p" ]]; then sox_play
+elif [[ "$1" = "u" ]]; then load_user_values
 elif [[ "$1" = 1 ]]; then preload 1
 elif [[ "$1" = 2 ]]; then preload 2
 elif [[ "$1" = 3 ]]; then preload 3
@@ -211,20 +266,21 @@ fi
 
 i=0
 y=0
-index=${#bank_key[*]}
+index=${#option_key[*]}
 while [[ "$i" -lt "$index" ]]; do
-	if [[ "$1" = "${bank_key[$i]}" ]]; then
+	if [[ "$1" = "${option_key[$i]}" ]]; then
 		if [[ $( echo "$i % 2" | bc ) -eq "0" ]]; then
 		        if [[ $( echo "${user_values[$y]} < ${max_values[$y]}" |bc ) -eq "1" ]]; then user_values[$y]=$( echo "${user_values[$y]}+${step_size[$y]}" | bc ); fi
 		else
 		        if [[ $( echo "${user_values[$y]} > 0" |bc ) -eq "1" ]]; then user_values[$y]=$( echo "${user_values[$y]}-${step_size[$y]}" | bc ); fi
 		fi
-		break
+		i=$index
 	fi
 	i=$[$i+1]
 	if [[ $( echo "$i % 2" | bc ) -eq "0" ]]; then y=$[$y+1]; fi
 done
 unset i
+unset y
 unset index
 }
 ### Working zone ##########################################
