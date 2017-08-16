@@ -2,11 +2,11 @@
 
 ### Values ##################################################
 
-user_values=("0" "0" "0" "0" "0" "0" "0" "0" "0" "0" )
+user_values=("0" "0" "0" "0" "0" "0" "0" "0" "0")
 bank_effect=("leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer")
-option_key=("a" "y" "s" "x" "d" "c" "f" "v" "g" "b" "h" "n" "j" "m" "k" "," "l" "." "ö" "-")
-control_key=("r" "u" "o" "1-9" "p" "0")
-control_key_desc=("Reset Values" "Load Values" "Save Values" "Load Bank" "Play Testsound" "Switch Bank")
+option_key=("a" "y" "s" "x" "d" "c" "f" "v" "g" "b" "h" "n" "j" "m" "k" "," "l" ".")
+control_key=("r" "e" "t" "1-9" "z" "0" "p" "o")
+control_key_desc=("Reset Values" "Load Values" "Save Values" "Load Bank" "Delete Bank" "Switch Bank" "Play Testsound" "Refresh GUI")
 
 ### function delete_bank ########################################
 function delete_bank {
@@ -129,14 +129,14 @@ display_var_as_block "$3" "12"
 display_var_as_block "$4" "4"
 display_var_as_block "$5" "4"
 
-printf "#\n"
+printf "\n"
 }
 
 ### Function gui_text #####################################
 function gui_text {
 pos=$(echo "$1" |wc -m )
 max=20
-printf "#  "$1
+printf "  "$1
 while [[ "$pos" -lt "$max" ]]; do
 	printf " "
 	pos=$[$pos+1]
@@ -175,7 +175,7 @@ function key_desc {
 	while [[ "$i" -lt "$index" ]]; do
 		display_var_as_block "   < ${control_key[$i]} >" "5"
 		display_var_as_block "${control_key_desc[$i]}" "15"
-		if [[ $( echo "( $i + 1 ) % 4" | bc  ) -eq 0 ]]; then 
+		if [[ $( echo "( $i + 1 ) % 3" | bc  ) -eq 0 ]]; then 
 			 printf "\n"
 		fi
 		i=$[$i+1]
@@ -188,7 +188,7 @@ unset index
 ### Function line ###########################################
 function line {
         i=0
-        while [[ "$i" -lt 100 ]]; do
+        while [[ "$i" -lt 80 ]]; do
                 printf "#"
                 i=$[$i+1]
         done
@@ -198,14 +198,7 @@ function line {
 
 ### Function lbr ############################################
 function lbr {
-	i=0
-	printf "#"
-        while [[ "$i" -lt 98 ]]; do
-                printf " "
-                i=$[$i+1]
-        done
-	printf "#\n"
-	unset i
+	printf "\n"
 }
 
 ### Funtion display_var_as_block (var, blocksize) ##########
@@ -239,6 +232,17 @@ function footer {
 	line
 }
 
+### Function tput_pos ######################################
+
+function tput_pos {
+tput sc
+line=$[$1+9]
+column=23
+tput cup $line $column
+printf "$2"
+tput rc
+}
+
 ### Function build gui #####################################
 
 function build_gui {
@@ -254,7 +258,10 @@ i=0
 index="${#effect_options[*]}"
 while [[ "$i" -lt "$index" ]]; do
 	gui_text "${effect_options[$i]}"
-	gui_balken "${user_values[$i]}" "${max_values[$i]}" "${step_size[$i]}" "${option_key[$y]}" "${option_key[$y+1]}"
+#	gui_balken "${user_values[$i]}" "${max_values[$i]}" "${step_size[$i]}" "${option_key[$y]}" "${option_key[$y+1]}"
+	gui_balken "" "${max_values[$i]}" "${step_size[$i]}" "${option_key[$y]}" "${option_key[$y+1]}"
+	tput_pos "$i" "${user_values[$i]}"
+
 	i=$[$i+1]
 	y=$[$y+2]
 done
@@ -264,6 +271,13 @@ unset i
 unset index
 }
 
+### Function refresh_gui ##################################
+function refresh_gui {
+clear
+header
+build_gui
+footer
+}
 
 ### Function sox_play #####################################
 function sox_play {
@@ -280,7 +294,7 @@ while [[ "$i" -lt "$index" ]]; do
 	i=$[$i+1]
 done
 echo $temp_effect > temp.effect
-killall play
+killall play 1>&/dev/null
 play -q test.wav $( cat temp.effect) &
 unset i
 unset index
@@ -298,11 +312,12 @@ function keypress {
 case "$1" in 
 	q) stop=1 ;;
 	p) sox_play ;;
-	u) load_user_values ;;
-	r) reset_user_values ;;
-	o) save ;;
-	z) delete_bank ;;
-	[0-9]) preload $1 ;;
+	e) load_user_values; refresh_gui ;;
+	r) reset_user_values; refresh_gui ;;
+	t) save ;;
+	z) delete_bank; refresh_gui ;;
+	o) refresh_gui ;;
+	[0-9]) preload $1; refresh_gui ;;
 	*)
 		i=0
 		y=0
@@ -319,6 +334,7 @@ case "$1" in
 				if [[  ${usr_val_str:0:1} == "." ]]; then
 	        	                user_values[$y]='0'"${user_values[$y]}"
 		                fi
+				tput_pos "$y" "${user_values[$y]}"
 				i=$index
 			fi
 			i=$[$i+1]
@@ -331,13 +347,11 @@ case "$1" in
 esac
 }
 ### Working zone ##########################################
-clear
 stop=0
+refresh_gui
 while [[ "$stop" = 0 ]]; do
-	header
-	build_gui
-	footer
-	read -n 1 key
+	tput_pos
+	read -s -n 1 key
 	keypress $key
-	clear
+
 done
