@@ -249,12 +249,26 @@ function footer {
 ### Function tput_pos ######################################
 
 function tput_pos {
-tput sc
-line=$[$1+9]
-column=23
-tput cup $line $column
-printf "$2"
-tput rc
+if ! [[ -z $2 ]]; then
+	tput sc
+	line=$[$1+9]
+	tput cup $line 20
+	printf "      "
+	tput rc
+	if [[ $( echo "$2 < 10" | bc ) = "1" && $( echo "$2 >= 0" | bc ) = "1" ]]; then column=23
+	elif [[ $( echo "$2 < 100" | bc ) = "1" && $( echo "$2 >= 10" | bc ) = "1" ]]; then column=22
+	elif [[ $( echo "$2 < 1000" | bc ) = "1" && $( echo "$2 >= 100" | bc ) = "1" ]]; then column=21
+	elif [[ $( echo "$2 < 10000" | bc ) = "1" && $( echo "$2 >= 1000" | bc ) = "1" ]]; then column=20
+	else 
+		column=19
+	fi
+	tput cup $line $column
+	printf "$2"
+	tput rc
+	unset line
+	unset output
+	unset column
+fi
 }
 
 ### Function build gui #####################################
