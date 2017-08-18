@@ -5,8 +5,8 @@
 user_values=("0" "0" "0" "0" "0" "0" "0" "0" "0")
 bank_effect=("leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer")
 option_key=("a" "y" "s" "x" "d" "c" "f" "v" "g" "b" "h" "n" "j" "m" "k" "," "l" ".")
-control_key=("r" "e" "t" "1-9" "z" "0" "p" "o")
-control_key_desc=("Reset Values" "Load Values" "Save Values" "Load Bank" "Delete Bank" "Switch Bank" "Play Testsound" "Refresh GUI")
+control_key=(" r " " e " " t " "1-9" " z " " 0 " " p " " o " " i " " u ")
+control_key_desc=("Reset Values" "Load Values" "Save Values" "Load Bank" "Delete Bank" "Switch Bank" "Play Testsound" "Refresh GUI" "Play All" "Save All")
 
 ### function delete_bank ########################################
 function delete_bank {
@@ -53,21 +53,28 @@ unset index
 ### funktion save  ##############################################
 function save {
 if ! [[ -z "$EFFECT_NAME" ]]; then
-	temp_effect="$EFFECT_NAME"
-	i=0
-	index="${#effect_options[*]}"
-	while [[ "$i" -lt "$index" ]]; do
-	        usr_values="${user_values[$i]}"
-		temp_effect="$temp_effect"' '"$usr_values"
-	        i=$[$i+1]
-	done
-	echo $temp_effect > "savenload/$EFFECT_NAME"
+	if ! [[ "$EFFECT_NAME" == "leer" ]]; then
+		temp_effect="$EFFECT_NAME"
+		i=0
+		index="${#effect_options[*]}"
+		while [[ "$i" -lt "$index" ]]; do
+		        usr_values="${user_values[$i]}"
+			temp_effect="$temp_effect"' '"$usr_values"
+		        i=$[$i+1]
+		done
+		echo $temp_effect > "savenload/$EFFECT_NAME"
+	fi
 fi
 unset i
 unset index
 unset usr_values
 }
 
+### Function save_all #######################################
+function save_all {
+	save
+#todo
+}
 
 ### Function preload ########################################
 function preload {
@@ -94,9 +101,13 @@ else
 			printf "\n"
 		fi
 	done
-	printf "Which bank do you want to switch to: "
-	read CHOOSE_EFFECT
-	EFFECT_NAME="${bank_effect[$CHOOSE_EFFECT-1]}"
+	test_it="leer"
+	while [[ "$test_it" == "leer" ]]; do
+		printf "Which bank do you want to switch to: "
+		read CHOOSE_EFFECT	
+		test_it="${bank_effect[$CHOOSE_EFFECT-1]}"
+	done
+	EFFECT_NAME="$test_it"
 fi
 EFFECT=( $( cat $EFFECTS_FOLDER""$EFFECT_NAME ) )
 
@@ -155,6 +166,9 @@ while [[ "$i" -lt "$index" ]]; do
 		transport="$y"'.'"${bank_effect[$i]}"
 	else
 		transport="0$y"'.'"${bank_effect[$i]}"
+	fi
+	if [[ "${bank_effect[$i]}" = "$EFFECT_NAME" ]]; then
+		transport="$transport"'.'"active" 
 	fi
 	gui_text $transport
 	if [[ "$i" = 3 || "$i" = 7 ]]; then
@@ -279,6 +293,11 @@ build_gui
 footer
 }
 
+### Function play_all #####################################
+function play_all {
+	save
+}
+
 ### Function sox_play #####################################
 function sox_play {
 temp_effect="$EFFECT_NAME"
@@ -317,6 +336,8 @@ case "$1" in
 	t) save ;;
 	z) delete_bank; refresh_gui ;;
 	o) refresh_gui ;;
+	i) play_all ;;
+	u) save_all ;;
 	[0-9]) preload $1; refresh_gui ;;
 	*)
 		i=0
