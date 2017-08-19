@@ -1,6 +1,6 @@
-gain-in 1.0 0.1 0.0 
-gain-out 10.0 0.1 0.0
-delay 1000 50 0
-decay 1.0 0.1 0.0
-delay 1000 50 0
-decay 1.0 0.1 0.0
+gain-in 0.1 1.0 0.1 0.3 s
+gain-out 0.1 10.0 0.1 0.5 s
+delay 50 1000 50 700 s
+decay 0.1 1.0 0.1 0.1 s
+delay 50 1000 50 300 s
+decay 0.1 1.0 0.1 0.1 s

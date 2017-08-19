@@ -1,0 +1,35 @@
+Syntax and information for effect_desc
+
+All content of the folder effect_desc contains the effect options of sox. No other files are allowed. 
+
+All files have to have be like this:
+
+Name of the file, have to be name of the effect in sox directly:
+
+As example reverb: 
+
+play test.wav reverb 70 30 20 25 8 6
+
+So the filename would be: reverb
+
+Now we want to explain the whole command. See below:
+
+Sox_Command filename effect1 option1 option2 option3 option4 option5 option6 
+
+play	    test.wav reverb  70	     30	     20	     25	     8	     6
+
+filename: reverb
+content:
+reverberance 0 100 1 0
+HF-damping 0 100 1 0
+room-scale 0 100 1 0
+stereo-depth 0 100 1 0
+pre-delay  0 10 1 0
+wet-gain 0 10 1 0		
+
+to explain what the values mean: 
+						increment	start
+option_name	min_value	max_value	step_size	user_value
+reverberance 	0		100		1		0
+
+I hope its clear what i mean. 

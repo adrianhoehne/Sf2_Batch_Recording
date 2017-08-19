@@ -1,0 +1,9 @@
+attack 0.0 5 0.1 0.3 ,
+decay 0.0 5 0.1 0.8 s
+soft_knee_db -10 10 0.5 6 :
+in-db1 -100 0 10 -70 ,
+out-db1 -100 0 10 -60 ,
+in-db2 -100 0 10 -20 s
+gain -10 5 1 -5 s
+initial-volume-db -100 0 10 -90 s
+delay 0.0 5 0.1 0.2 s
