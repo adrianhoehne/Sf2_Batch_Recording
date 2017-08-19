@@ -6,7 +6,7 @@ user_values=("0" "0" "0" "0" "0" "0" "0" "0" "0")
 bank_effect=("leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer")
 option_key=("a" "y" "s" "x" "d" "c" "f" "v" "g" "b" "h" "n" "j" "m" "k" "," "l" ".")
 control_key=(" r " " e " " t " "1-9" " z " " 0 " " p " " o " " i " " u ")
-control_key_desc=("Reset Values to 0" "Load Values" "Save Values" "Load Bank" "Delete Bank" "Switch Bank" "Play Testsound" "Refresh GUI" "Play All" "Save All")
+control_key_desc=("Set Values to 0" "Load Values" "Save Values" "Load Bank" "Delete Bank" "Switch Bank" "Play Testsound" "Refresh GUI" "Play All" "Save All")
 
 ### function delete_bank ########################################
 function delete_bank {
@@ -72,8 +72,81 @@ unset usr_values
 
 ### Function save_all #######################################
 function save_all {
-	save
-#todo
+### Ask for a name ###
+	choose_name=$1
+	while [[ -z "$choose_name" ]]; do
+		printf "Choose filename of your effect.file:"
+		read choose_name
+		if [[ -e effects/$choose_name ]]; then
+			printf "\nfilename exist. Will you overwrite it? [y/n]:\n"
+			read overwrite_file
+			if [[ "$overwrite_file" = "y" ]]; then
+				echo "" > "effects/$choose_name"
+			else
+				unset choose_name
+			fi
+		else
+			touch "effects/$choose_name"
+		fi
+	done
+	if [[ "$choose_name" = "test.all.play" ]]; then
+		rm test.all.play 1>&/dev/null
+		touch test.all.play
+	fi
+	i=0
+	index="${#bank_effect[*]}"
+	while [[ "$i" -lt "$index" ]]; do
+		if ! [[ "${bank_effect[$i]}" = "leer" ]]; then
+			sv_EFFECT_NAME="${bank_effect[$i]}"
+
+			### load user settings lus ###
+			### load separator ls ###
+			### finish it ###
+
+			temp_effect="$sv_EFFECT_NAME"' '					# fi
+			if [[ -e savenload/$sv_EFFECT_NAME ]]; then
+			        sv_load_values=( $( cat savenload/$sv_EFFECT_NAME ) ) 		# lus
+				sv_EFFECT=( $( cat $EFFECTS_FOLDER""$sv_EFFECT_NAME ) )		# ls
+			        sv_i=0								# lus ls
+			        sv_index="${#sv_load_values[*]}"				# lus ls
+				sv_y=0								# ls
+			        while [[ "$sv_i" -lt "$sv_index" ]]; do				# lus ls
+		                	sv_user_values[$sv_i]="${sv_load_values[$sv_i+1]}"	# lus
+					sv_separator[$sv_i]="${sv_EFFECT[$sv_y+5]}"		# ls
+				        sv_usr_values="${sv_user_values[$sv_i]}"		# fi
+				        sv_sep="${sv_separator[$sv_i]}"				# fi
+				        if [[ "$sv_sep" = "s" ]]; then					#fi
+				                temp_effect="$temp_effect"''"$sv_usr_values"' '		#fi
+				        else								#fi
+				                temp_effect="$temp_effect"''"$sv_usr_values"''"$sv_sep"	#fi
+			        	fi								#fi
+					sv_i=$[$sv_i+1]						# lus ls fi
+					sv_y=$[$sv_y+6]						# ls
+			        done								# lus ls fi
+			fi
+			echo "$temp_effect" >> "effects/$choose_name"				# fi
+
+		fi
+		i=$[$i+1]
+done
+killall play 1>&/dev/null
+play -q test.wav $( cat effects/$choose_name ) 
+
+unset i
+unset index
+unset choose_name
+unset sv_i
+unset sv_index
+unset sv_y
+unset temp_effect
+unset sv_load_values
+unset sv_EFFECT_NAME
+unset sv_EFFECT
+unset sv_user_values
+unset sv_separator
+unset sv_usr_values
+unset sv_sep
+unset temp_effect
 }
 
 ### Function preload ########################################
@@ -248,9 +321,9 @@ function footer {
 	lbr
 	key_desc
 	lbr
-	printf "   Message for you: $error1 \n"
-	lbr
 	line
+	printf "columns: $( tput cols ) lines: $( tput lines) \n"
+	printf "Press < o > to refresh ui and delete below messages:\n"
 }
 
 ### Function tput_pos ######################################
@@ -325,7 +398,7 @@ footer
 
 ### Function play_all #####################################
 function play_all {
-	save
+	save_all "test.all.play"
 }
 
 ### Function sox_play #####################################
@@ -349,6 +422,7 @@ play -q test.wav $( cat temp.effect) &
 unset i
 unset index
 unset usr_values
+unset temp_effect
 }
 
 ### Function KeyPress #####################################
@@ -363,8 +437,8 @@ case "$1" in
 	z) delete_bank; refresh_gui ;;
 	o) refresh_gui ;;
 	i) play_all ;;
-	u) save_all ;;
-	[0-9]) preload $1; refresh_gui ;;
+	u) save; save_all ;;
+	[0-9]) save; preload $1; refresh_gui ;;
 	*)
 		i=0
 		y=0
