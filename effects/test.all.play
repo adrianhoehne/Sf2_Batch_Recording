@@ -1,0 +1,13 @@
+bass 0 
+phaser 0.8 0.7 3 0.4 0.5 
+bass 0 
+compand 0.3,0.8 6:-70,-60,-20 -5 -90 0.2 
+contrast 75 
+compand 0.3,0.8 6:-70,-60,-20 -5 -90 0.2 
+contrast 75 
+compand 0.3,0.8 6:-70,-60,-20 -5 -90 0.2 
+contrast 75 
+compand 0.3,0.8 6:-70,-60,-20 -5 -90 0.2 
+contrast 75 
+compand 0.3,0.8 6:-70,-60,-20 -5 -90 0.2 
+contrast 75 

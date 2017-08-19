@@ -1,12 +1,14 @@
 #!/bin/bash
 
+user_name="$( whoami )" # i need this for the function show_error to filter only user pid
+
 ### Values ##################################################
 
 user_values=("0" "0" "0" "0" "0" "0" "0" "0" "0")
 bank_effect=("leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer" "leer")
 option_key=("a" "y" "s" "x" "d" "c" "f" "v" "g" "b" "h" "n" "j" "m" "k" "," "l" ".")
-control_key=(" r " " e " " t " "1-9" " z " " 0 " " p " " o " " i " " u ")
-control_key_desc=("Set Values to 0" "Load Values" "Save Values" "Load Bank" "Delete Bank" "Switch Bank" "Play Testsound" "Refresh GUI" "Play All" "Save All")
+control_key=(" r " " e " " t " "1-9" " z " " 0 " " p " " o " " i " " u " " w " )
+control_key_desc=("Set Values to 0" "Load Values" "Save Values" "Load Bank" "Delete Bank" "Switch Bank" "Play Testsound" "Refresh GUI" "Play All" "Save All" "Show error message if it sounds crazy")
 
 ### function delete_bank ########################################
 function delete_bank {
@@ -130,7 +132,7 @@ function save_all {
 		i=$[$i+1]
 done
 killall play 1>&/dev/null
-play -q test.wav $( cat effects/$choose_name ) 
+play -q test.wav $( cat effects/$choose_name ) 1>&/tmp/error1
 
 unset i
 unset index
@@ -396,6 +398,18 @@ build_gui
 footer
 }
 
+### Function show_error ###################################
+function show_error {
+printf "wait for play error message"
+while ! [[ -z "$( pgrep -u "$user_name" play )" ]]; do
+	printf "."
+done
+refresh_gui
+error1="$( cat /tmp/error1 )"
+rm /tmp/error1 && touch /tmp/error1
+printf "%s" "$error1"
+}
+
 ### Function play_all #####################################
 function play_all {
 	save_all "test.all.play"
@@ -418,7 +432,7 @@ while [[ "$i" -lt "$index" ]]; do
 done
 echo $temp_effect > temp.effect
 killall play 1>&/dev/null
-play -q test.wav $( cat temp.effect) &
+play -q test.wav $( cat temp.effect ) 1>&/tmp/error1 &
 unset i
 unset index
 unset usr_values
@@ -439,6 +453,7 @@ case "$1" in
 	i) play_all ;;
 	u) save; save_all ;;
 	[0-9]) save; preload $1; refresh_gui ;;
+	w) show_error ;;
 	*)
 		i=0
 		y=0
