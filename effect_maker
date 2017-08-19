@@ -217,10 +217,10 @@ unset CHOOSE_EFFECT
 ### Function gui_balken #####################################
 function gui_balken {
 display_var_as_block "$1" "12"
-display_var_as_block "$2" "12"
-display_var_as_block "$3" "12"
-display_var_as_block "$4" "4"
-display_var_as_block "$5" "4"
+display_var_as_block "$2" "4"
+display_var_as_block "$3" "4"
+display_var_as_block "$4" "12"
+display_var_as_block "$5" "12"
 
 printf "\n"
 }
@@ -372,13 +372,12 @@ fi
 function build_gui {
 lbr
 gui_text "Name"
-gui_balken "Position" "Max Value" "Step Size" "+" "-"
+gui_balken "Position" "+" "-" "Max Value" "Step Size"
 i=0
 index="${#effect_options[*]}"
 while [[ "$i" -lt "$index" ]]; do
 	gui_text "${effect_options[$i]}"
-#	gui_balken "${user_values[$i]}" "${max_values[$i]}" "${step_size[$i]}" "${option_key[$y]}" "${option_key[$y+1]}"
-	gui_balken "" "${max_values[$i]}" "${step_size[$i]}" "${option_key[$y]}" "${option_key[$y+1]}"
+	gui_balken "" "${option_key[$y]}" "${option_key[$y+1]}" "${max_values[$i]}" "${step_size[$i]}"
 	tput_pos "$i" "${user_values[$i]}"
 
 	i=$[$i+1]
