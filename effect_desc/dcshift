@@ -1,0 +1,2 @@
+shift -2 2 0.01 0 s
+limitergain 0.01 0.1 0.01 0.02 s

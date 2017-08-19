@@ -1,0 +1,6 @@
+delay 0 30 1 0 s
+depth 0 10 1 2 s
+regen -95 95 1 0 s
+width 0 100 1 71 s
+speed 0.1 10 0.1 0.5 s
+phase 0 100 1 25 s
