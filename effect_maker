@@ -94,6 +94,8 @@ function save_all {
 	if [[ "$choose_name" = "test.all.play" ]]; then
 		rm test.all.play 1>&/dev/null
 		touch test.all.play
+	else
+		choose_name="effects/$choose_name"
 	fi
 	i=0
 	index="${#bank_effect[*]}"
@@ -126,13 +128,12 @@ function save_all {
 					sv_y=$[$sv_y+6]						# ls
 			        done								# lus ls fi
 			fi
-			echo "$temp_effect" >> "effects/$choose_name"				# fi
-
+			echo "$temp_effect" >> "$choose_name"					# fi
 		fi
 		i=$[$i+1]
 done
 killall play 1>&/dev/null
-play -q test.wav $( cat effects/$choose_name ) 1>&/tmp/error1
+play -q test.wav $( cat $choose_name ) 1>&/tmp/error1 &
 
 unset i
 unset index
@@ -444,14 +445,14 @@ function keypress {
 case "$1" in 
 	q) stop=1 ;;
 	p) sox_play ;;
-	e) load_user_values; refresh_gui ;;
-	r) reset_user_values; refresh_gui ;;
+	e) load_user_values; refresh_gui; save ;;
+	r) reset_user_values; refresh_gui; save ;;
 	t) save ;;
-	z) delete_bank; refresh_gui ;;
+	z) delete_bank; preload "0"; refresh_gui; save ;;
 	o) refresh_gui ;;
-	i) play_all ;;
+	i) save; play_all ;;
 	u) save; save_all ;;
-	[0-9]) save; preload $1; refresh_gui ;;
+	[0-9]) save; preload $1; refresh_gui; save ;;
 	w) show_error ;;
 	*)
 		i=0
