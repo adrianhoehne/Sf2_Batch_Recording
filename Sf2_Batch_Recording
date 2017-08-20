@@ -123,7 +123,7 @@ done
 printf "Sample length will be $time seconds\n"
 
 ### Debug play #################################################################
-printf '\nDo you want to play every note past conversation? This will double the duration.
+printf '\nDo you want to play every note past conversion? This will double the duration.
 1 or enter for no '
 read debug
 
@@ -214,7 +214,7 @@ while [[ "$a" != "$b" ]]
 		play $SOUNDBANK/$filename.wav
 	fi
 done
-killall caffeinate &
+killall caffeinate 1>&/dev/null &
 
 ### cleaning files ##############################################################
 
