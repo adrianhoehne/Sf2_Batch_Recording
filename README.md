@@ -22,6 +22,8 @@ This software is needed and has to work from everywhere in the console.
 - https://github.com/FluidSynth/fluidsynth
 - https://sox.sourceforge.io/
 - screen command
+- tput command
+- bc command
 
 you can install it yourself or via homebrew. I did it via homebrew.
 
