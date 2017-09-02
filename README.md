@@ -1,14 +1,14 @@
 # Overview
 - Sf2_Batch_Recording
 
-Script status is ready to go
+Script status is "ready to go"
 Script to make samples for SamplerBox from sf2 for Mac OSX
 
 http://www.samplerbox.org/
 
 - effect_maker
 
-Script status is work in progress
+Script status is "ready to go"
 Script to test sox effects and save it for use with Sf2_Batch_Recording
 More information below
 
@@ -64,8 +64,10 @@ I tested it with note 60. But you can choose whatever you want.
 
 # effect_maker
 
-You can try and play with effects from Sox.
-If you are happy with that effect you can save it and use it with Sf2_Batch_Recording and generate your wav samples including effects.
-In a later release it will be possible to combine about 10 effects.
+You 
+- can play with effects from Sox.
+- can combine some effects an play it all once or each for each.
+- can save each setting and make a effects_file for Sf2_Batch_Recording.
 
-effect_maker is in work
+If you are happy with that effect you can save it and use it with Sf2_Batch_Recording, to generate your wav samples including effects.
+
